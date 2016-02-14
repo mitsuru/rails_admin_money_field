@@ -11,7 +11,39 @@ module RailsAdmin
     module Fields
       module Types
         class MoneyField < RailsAdmin::Config::Fields::Base
-          RailsAdmin::Config::Fields::Types::register(self)
+          RailsAdmin::Config::Fields::Types::register(:money, self)
+
+          def allowed_methods
+            [@name, cents_field, currency_field]
+          end
+
+          register_instance_option(:partial) do
+            :form_money
+          end
+
+          register_instance_option(:cents_field) do
+            "#{@name}_cents"
+          end
+
+          register_instance_option(:currency_field) do
+            "#{@name}_currency"
+          end
+
+          register_instance_option(:currencies) do
+            nil
+          end
+
+          register_instance_option(:default_currency) do
+            nil
+          end
+
+          def currency_collection
+            if currencies
+              currencies.map { |c| ::Money::Currency.find(c.to_sym) }
+            else
+              ::Money::Currency.all
+            end
+          end
         end
       end
     end
